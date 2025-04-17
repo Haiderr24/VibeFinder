@@ -4,8 +4,14 @@ import './App.css';
 import LandingPage from './components/LandingPage';
 import VibeSelection from './components/VibeSelection';
 
+
+
 function App() {
+  
+
+
   return (
+    
     <Router>
       <div className="App">
         <Routes>
@@ -15,6 +21,8 @@ function App() {
       </div>
     </Router>
   );
+
+  
 }
 
 export default App;

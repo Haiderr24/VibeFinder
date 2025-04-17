@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import './VibeSelection.css';
+
 
 const VibeSelection = () => {
   const [selectedVibe, setSelectedVibe] = useState(null);
+
+  const {isLoaded, loadError} = useLoadScript({googleMapsApiKey : process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+      libraries: ["places"]
+    });
+
+  const [places, setPlaces] = useState([]);
+
+    const center = useMemo(() => ({ lat: 40.7128, lng: -74.0060 }), []);
+  
+    if (loadError) return <div>Error loading maps</div>;
+    if (!isLoaded) return <div>Loading map...</div>;
+  
 
   const vibeOptions = [
     { id: 'social', label: 'Social' },
@@ -13,7 +27,136 @@ const VibeSelection = () => {
 
   const handleVibeSelect = (vibeId) => {
     setSelectedVibe(vibeId);
+    searchPlaces(vibeId);
   };
+
+  const searchPlaces = (vibe) => {
+    if (!window.google) return;
+
+    const service = new window.google.maps.places.PlacesService(document.createElement('div'));
+
+    const vibeKeywords = {
+      social:["cafe", "lounge", "bar", "restaurant", "comedy club", "arcade"],
+      productive: ["library", "coffee shop", "bookstore", "study cafe", "workspace"],
+      adventurous:["hiking trial", "escape room", "paintball", "rock climbing", "amusement park", "adventure park"],
+      chill: ["spa", "park", "beach", "tea house", "yoga studio", "museum", "art gallery"]
+      
+    };
+
+    const request = {
+      location: { lat: 40.7128, lng: -74.0060 },
+      radius: 5000,
+      keyword: (vibeKeywords[vibe] || ["fun"]).join(" ")
+    };
+
+    service.nearbySearch(request, (results, status) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        setPlaces(results);
+      }
+    
+  });
+};
+    
+
+  const mapStyle = {
+    width: "100%",
+    height: "585px",
+    borderRadius: "1rem",
+  };
+  
+
+  const darkMapStyle =[{ elementType: "geometry", stylers: [{ color: "#212121" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+  {
+    featureType: "administrative",
+    elementType: "geometry",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "administrative.country",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9e9e9e" }],
+  },
+  {
+    featureType: "administrative.land_parcel",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#181818" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#616161" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#1b1b1b" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#2c2c2c" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#8a8a8a" }],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#373737" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#3c3c3c" }],
+  },
+  {
+    featureType: "road.highway.controlled_access",
+    elementType: "geometry",
+    stylers: [{ color: "#4e4e4e" }],
+  },
+  {
+    featureType: "road.local",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#616161" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [{ color: "#2f3948" }],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#d59563" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#000000" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#3d3d3d" }],
+  },
+];
+
+
+
 
   return (
     <div className="vibe-selection">
@@ -21,7 +164,22 @@ const VibeSelection = () => {
         <h1>Find Your Vibe.</h1>
         <div className="vibe-options">
           <div className="map-container">
-            {/* Google Maps will be integrated here */}
+          <GoogleMap
+            mapContainerStyle={mapStyle}
+            center={center}
+            zoom={12}
+            options={{
+              styles: darkMapStyle,
+              disableDefaultUI: true,
+            }}
+            ><Marker position={center} title="New York City" />
+            {places.map((place) => (
+            <Marker 
+            key={place.place_id}
+            position={place.geometry.location}
+            title={place.name}
+             />))}
+          </GoogleMap>
             <div className="map-placeholder"></div>
           </div>
           <div className="options-panel">
