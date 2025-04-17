@@ -38,8 +38,8 @@ const VibeSelection = () => {
     const vibeKeywords = {
       social:["cafe", "lounge", "bar", "restaurant", "comedy club", "arcade"],
       productive: ["library", "coffee shop", "bookstore", "study cafe", "workspace"],
-      adventurous:["hiking trial", "escape room", "paintball", "rock climbing", "amusement park", "adventure park"],
-      chill: ["spa", "park", "beach", "tea house", "yoga studio", "museum", "art gallery"]
+      adventurous:["escape room", "paintball", "rock climbing", "amusement park", "axe throwing", "speakeasy", "live jazz club",  "skyline helicopter tour",  "skyline helicopter tour"],
+      chill: ["spa", "lounge", "pier", "park",  "scenic view", "korean spa",  "beach", "tea house", "yoga studio", "museum", "art gallery", "rooftop lounge", "live jazz club", "botanical garden", "wine bar"],
       
     };
 
@@ -182,6 +182,7 @@ const VibeSelection = () => {
           </GoogleMap>
             <div className="map-placeholder"></div>
           </div>
+          
           <div className="options-panel">
             <h2>Choose your vibe</h2>
             <div className="toggle-list">
@@ -204,6 +205,23 @@ const VibeSelection = () => {
               ))}
             </div>
           </div>
+
+          <div className="options-panel">
+            <h2>Your Next Move</h2>
+            <div className="secondary-panel">
+             <p>Once you’ve picked a vibe, check out top-rated places nearby.</p>
+              
+              <button 
+              className="action-button"
+              onClick={() => {
+               if (selectedVibe) {
+                  searchPlaces(selectedVibe);
+                }
+              }}
+            >See More</button>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>
