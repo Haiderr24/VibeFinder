@@ -53,6 +53,7 @@ const VibeSelection = () => {
         const limitedResults = results.slice(0, 20); // Limit to 20 total places
         console.log(`Found ${limitedResults.length} places for ${vibe} vibe`);
         setPlaces(limitedResults);
+       
 
         //console.log(limitedResults[0].name);
         renderList(limitedResults);
@@ -172,12 +173,24 @@ function renderList(locations) {
 
     const dt = document.createElement('dt');
     const dd = document.createElement('dd');
+    
 
     dt.textContent = locations.name;
     dd.textContent = "- " + locations.vicinity;
 
+    const button = document.createElement('button');
+    button.className = 'arrow-button';
+    button.innerHTML = 'More <span class="arrow">→</span>';
+    button.onclick=()=>{
+      window.location.href = `/place/${locations.place_id}`;
+    };
+  
+   
+    
+
     div.appendChild(dt);
     div.appendChild(dd);
+    div.appendChild(button);
     locationList.appendChild(div);
   });
 }
@@ -199,7 +212,7 @@ function renderList(locations) {
             }}
             ><Marker position={center} title="New York City" />
             {places.map((place) => (
-            <Marker 
+            <Marker
             key={place.place_id}
             position={place.geometry.location}
             title={place.name}
@@ -236,20 +249,12 @@ function renderList(locations) {
         </div>
 
         <div className="options-panel">
-            <h2>Your Next Move</h2>
+            <h3>Your Next Move</h3>
             <div className="secondary-panel">
               <dl id="locationNameList">
                 <dt>Once you've picked a vibe, check out top-rated places nearby</dt>
               </dl>
-              
-              {/* <button 
-              className="action-button"
-              onClick={() => {
-               if (selectedVibe) {
-                  searchPlaces(selectedVibe);
-                }
-              }}
-              >See More</button> */}
+            
             </div>
           </div>
         
