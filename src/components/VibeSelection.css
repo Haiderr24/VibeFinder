@@ -19,8 +19,9 @@
 .vibe-options {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  gap: 1rem;
   align-items: start;
+  margin-bottom: 2rem;
 }
 
 .map-container {
@@ -42,6 +43,7 @@
   padding: 2rem;
   border-radius: 12px;
   backdrop-filter: blur(10px);
+
 }
 
 .options-panel h2 {
@@ -137,3 +139,10 @@
   transform:scale(0.97);
 }
 
+.location-list{
+  text-align: left;
+  margin: .5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+  border-radius: 12px;
+  padding: .5rem; 
+}

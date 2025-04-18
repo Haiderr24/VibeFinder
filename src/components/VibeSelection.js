@@ -53,6 +53,10 @@ const VibeSelection = () => {
         const limitedResults = results.slice(0, 20); // Limit to 20 total places
         console.log(`Found ${limitedResults.length} places for ${vibe} vibe`);
         setPlaces(limitedResults);
+
+        //console.log(limitedResults[0].name);
+        renderList(limitedResults);
+
       } else {
         console.error(`Place search failed for ${vibe} vibe. Status:`, status);
         setPlaces([]);
@@ -158,13 +162,31 @@ const VibeSelection = () => {
   },
 ];
 
+function renderList(locations) {
+  const locationList = document.getElementById('locationNameList');
+  locationList.innerHTML = ''; // Clear existing list
 
+  locations.forEach(locations => {
+    const div = document.createElement('div');
+    div.classList.add('location-list');
+
+    const dt = document.createElement('dt');
+    const dd = document.createElement('dd');
+
+    dt.textContent = locations.name;
+    dd.textContent = "- " + locations.vicinity;
+
+    div.appendChild(dt);
+    div.appendChild(dd);
+    locationList.appendChild(div);
+  });
+}
 
 
   return (
     <div className="vibe-selection">
       <div className="vibe-content">
-        <h1>Find Your Vibe.</h1>
+        <h1>Find Your Vibe</h1>
         <div className="vibe-options">
           <div className="map-container">
           <GoogleMap
@@ -209,23 +231,28 @@ const VibeSelection = () => {
             </div>
           </div>
 
-          <div className="options-panel">
+          
+          
+        </div>
+
+        <div className="options-panel">
             <h2>Your Next Move</h2>
             <div className="secondary-panel">
-             <p>Once you've picked a vibe, check out top-rated places nearby.</p>
+              <dl id="locationNameList">
+                <dt>Once you've picked a vibe, check out top-rated places nearby</dt>
+              </dl>
               
-              <button 
+              {/* <button 
               className="action-button"
               onClick={() => {
                if (selectedVibe) {
                   searchPlaces(selectedVibe);
                 }
               }}
-            >See More</button>
+              >See More</button> */}
             </div>
           </div>
-          
-        </div>
+        
       </div>
     </div>
   );
