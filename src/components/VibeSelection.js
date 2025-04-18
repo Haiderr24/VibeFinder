@@ -36,26 +36,29 @@ const VibeSelection = () => {
     const service = new window.google.maps.places.PlacesService(document.createElement('div'));
 
     const vibeKeywords = {
-      social:["cafe", "lounge", "bar", "restaurant", "comedy club", "arcade"],
+      social: ["cafe", "lounge", "bar", "restaurant", "comedy club", "arcade"],
       productive: ["library", "coffee shop", "bookstore", "study cafe", "workspace"],
-      adventurous:["escape room", "paintball", "rock climbing", "amusement park", "axe throwing", "speakeasy", "live jazz club",  "skyline helicopter tour",  "skyline helicopter tour"],
-      chill: ["spa", "lounge", "pier", "park",  "scenic view", "korean spa",  "beach", "tea house", "yoga studio", "museum", "art gallery", "rooftop lounge", "live jazz club", "botanical garden", "wine bar"],
-      
+      adventurous: ["escape room", "paintball", "rock climbing", "amusement park", "axe throwing", "speakeasy"],
+      chill: ["park", "cafe", "garden", "spa", "art gallery", "museum"]
     };
 
     const request = {
       location: { lat: 40.7128, lng: -74.0060 },
-      radius: 5000,
-      keyword: (vibeKeywords[vibe] || ["fun"]).join(" ")
+      radius: 10000,
+      keyword: vibeKeywords[vibe].join(" | ")  // Using | as OR operator
     };
 
     service.nearbySearch(request, (results, status) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        setPlaces(results);
+        const limitedResults = results.slice(0, 20); // Limit to 20 total places
+        console.log(`Found ${limitedResults.length} places for ${vibe} vibe`);
+        setPlaces(limitedResults);
+      } else {
+        console.error(`Place search failed for ${vibe} vibe. Status:`, status);
+        setPlaces([]);
       }
-    
-  });
-};
+    });
+  };
     
 
   const mapStyle = {
@@ -209,7 +212,7 @@ const VibeSelection = () => {
           <div className="options-panel">
             <h2>Your Next Move</h2>
             <div className="secondary-panel">
-             <p>Once you’ve picked a vibe, check out top-rated places nearby.</p>
+             <p>Once you've picked a vibe, check out top-rated places nearby.</p>
               
               <button 
               className="action-button"
