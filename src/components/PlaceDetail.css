@@ -5,6 +5,35 @@
     padding: 2rem;
 }
 
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.back-button, .favorites-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover, .favorites-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.back-button:hover {
+    transform: translateX(-5px);
+}
+
+.favorites-button:hover {
+    transform: translateX(5px);
+}
+
 .place-details-content {
     max-width: 800px;
     margin: 0 auto;
@@ -14,21 +43,29 @@
     backdrop-filter: blur(10px);
 }
 
-.back-button {
-    background: rgba(255, 255, 255, 0.1);
+.place-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.favorite-button {
+    background: transparent;
     border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
+    color: #8B5CF6;
+    font-size: 2rem;
     cursor: pointer;
-    font-size: 1rem;
+    padding: 0.5rem;
     transition: all 0.3s ease;
 }
 
-.back-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(-5px);
+.favorite-button:hover {
+    transform: scale(1.2);
+}
+
+.favorite-button.favorited {
+    color: #FCD34D;
 }
 
 .place-photo {
