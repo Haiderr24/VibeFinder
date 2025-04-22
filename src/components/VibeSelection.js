@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import React, { useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GoogleMap, Marker, useLoadScript, InfoWindow } from '@react-google-maps/api';
 import './VibeSelection.css';
 
 
 const VibeSelection = () => {
   const [selectedVibe, setSelectedVibe] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const locationRefs = useRef({});
+  const navigate = useNavigate();
 
   const {isLoaded, loadError} = useLoadScript({googleMapsApiKey : process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
       libraries: ["places"]
@@ -53,11 +57,6 @@ const VibeSelection = () => {
         const limitedResults = results.slice(0, 20); // Limit to 20 total places
         console.log(`Found ${limitedResults.length} places for ${vibe} vibe`);
         setPlaces(limitedResults);
-       
-
-        //console.log(limitedResults[0].name);
-        renderList(limitedResults);
-
       } else {
         console.error(`Place search failed for ${vibe} vibe. Status:`, status);
         setPlaces([]);
@@ -163,38 +162,13 @@ const VibeSelection = () => {
   },
 ];
 
-function renderList(locations) {
-  const locationList = document.getElementById('locationNameList');
-  locationList.innerHTML = ''; // Clear existing list
-
-  locations.forEach(locations => {
-    const div = document.createElement('div');
-    div.classList.add('location-list');
-
-    const dt = document.createElement('dt');
-    const dd = document.createElement('dd');
-    
-
-    dt.textContent = locations.name;
-    dd.textContent = "- " + locations.vicinity;
-
-    const button = document.createElement('button');
-    button.className = 'arrow-button';
-    button.innerHTML = 'More <span class="arrow">→</span>';
-    button.onclick=()=>{
-      window.location.href = `/place/${locations.place_id}`;
-    };
-  
-   
-    
-
-    div.appendChild(dt);
-    div.appendChild(dd);
-    div.appendChild(button);
-    locationList.appendChild(div);
-  });
-}
-
+  const scrollToCard = (placeId) => {
+    setSelectedPlace(placeId);
+    locationRefs.current[placeId]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  };
 
   return (
     <div className="vibe-selection">
@@ -202,23 +176,75 @@ function renderList(locations) {
         <h1>Find Your Vibe</h1>
         <div className="vibe-options">
           <div className="map-container">
-          <GoogleMap
-            mapContainerStyle={mapStyle}
-            center={center}
-            zoom={12}
-            options={{
-              styles: darkMapStyle,
-              disableDefaultUI: true,
-            }}
-            ><Marker position={center} title="New York City" />
-            {places.map((place) => (
-            <Marker
-            key={place.place_id}
-            position={place.geometry.location}
-            title={place.name}
-             />))}
-          </GoogleMap>
-            <div className="map-placeholder"></div>
+            <GoogleMap
+              mapContainerStyle={mapStyle}
+              center={center}
+              zoom={12}
+              options={{
+                styles: darkMapStyle,
+                disableDefaultUI: true,
+              }}
+            >
+              <Marker position={center} title="New York City" />
+              {places.map((place) => (
+                <Marker
+                  key={place.place_id}
+                  position={place.geometry.location}
+                  title={place.name}
+                  onClick={() => setSelectedPlace(place)}
+                />
+              ))}
+              {selectedPlace && (
+                <InfoWindow
+                  position={selectedPlace.geometry.location}
+                  onCloseClick={() => setSelectedPlace(null)}
+                  options={{
+                    pixelOffset: new window.google.maps.Size(0, -5),
+                    maxWidth: 200,
+                    disableAutoPan: true
+                  }}
+                >
+                  <div style={{
+                    padding: '8px',
+                    background: 'rgba(26, 26, 26, 0.95)',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                  }}>
+                    <h3 style={{
+                      margin: '0 0 4px 0',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#8B5CF6'
+                    }}>{selectedPlace.name}</h3>
+                    <p style={{
+                      margin: '0 0 8px 0',
+                      fontSize: '12px',
+                      color: '#9CA3AF'
+                    }}>{selectedPlace.vicinity}</p>
+                    <button 
+                      onClick={() => navigate(`/place/${selectedPlace.place_id}`)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 12px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.9)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(139, 92, 246, 1)'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(139, 92, 246, 0.9)'}
+                    >
+                      More Details →
+                    </button>
+                  </div>
+                </InfoWindow>
+              )}
+            </GoogleMap>
           </div>
           
           <div className="options-panel">
@@ -243,21 +269,89 @@ function renderList(locations) {
               ))}
             </div>
           </div>
-
-          
-          
         </div>
 
         <div className="options-panel">
-            <h3>Your Next Move</h3>
-            <div className="secondary-panel">
-              <dl id="locationNameList">
-                <dt>Once you've picked a vibe, check out top-rated places nearby</dt>
-              </dl>
-            
-            </div>
+          <h3>Places to Check Out</h3>
+          <div className="secondary-panel">
+            {places.length > 0 ? (
+              <div className="location-list-container">
+                {places.map((place) => (
+                  <div 
+                    key={place.place_id} 
+                    className="location-list"
+                    ref={el => locationRefs.current[place.place_id] = el}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '12px',
+                      margin: '8px 0',
+                      background: 'rgba(139, 92, 246, 0.1)',
+                      borderRadius: '8px',
+                      transition: 'all 0.2s ease',
+                      cursor: 'pointer',
+                      border: '1px solid rgba(139, 92, 246, 0.2)'
+                    }}
+                    onClick={() => navigate(`/place/${place.place_id}`)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(139, 92, 246, 0.1)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ 
+                        margin: '0 0 4px 0',
+                        color: '#8B5CF6',
+                        fontSize: '16px',
+                        fontWeight: '600'
+                      }}>
+                        {place.name}
+                      </h4>
+                      <p style={{ 
+                        margin: 0,
+                        color: '#9CA3AF',
+                        fontSize: '14px'
+                      }}>
+                        {place.vicinity}
+                      </p>
+                    </div>
+                    <div 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#8B5CF6',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      View Details
+                      <svg 
+                        style={{ marginLeft: '4px' }} 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>Once you've picked a vibe, check out top-rated places nearby.</p>
+            )}
           </div>
-        
+        </div>
       </div>
     </div>
   );
