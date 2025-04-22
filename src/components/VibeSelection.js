@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from '@react-google-maps/api';
 import './VibeSelection.css';
 
+// Define libraries array as a constant outside the component
+const libraries = ["places"];
 
 const VibeSelection = () => {
   const [selectedVibe, setSelectedVibe] = useState(null);
@@ -10,9 +12,10 @@ const VibeSelection = () => {
   const locationRefs = useRef({});
   const navigate = useNavigate();
 
-  const {isLoaded, loadError} = useLoadScript({googleMapsApiKey : process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-      libraries: ["places"]
-    });
+  const {isLoaded, loadError} = useLoadScript({
+      googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+      libraries
+  });
 
   const [places, setPlaces] = useState([]);
 
@@ -268,6 +271,12 @@ const VibeSelection = () => {
                 </div>
               ))}
             </div>
+            <button 
+              className="view-favorites-button"
+              onClick={() => navigate('/favorites')}
+            >
+              View Favorites ★
+            </button>
           </div>
         </div>
 

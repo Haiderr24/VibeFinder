@@ -9,6 +9,7 @@ const PlaceDetail = () => {
     const [placeDetails, setPlaceDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -30,12 +31,35 @@ const PlaceDetail = () => {
             if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                 setPlaceDetails(place);
                 setLoading(false);
+                // Check if this place is in favorites
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                setIsFavorite(favorites.some(fav => fav.placeId === placeId));
             } else {
                 setError('Could not load place details');
                 setLoading(false);
             }
         });
     }, [placeId, isLoaded]);
+
+    const toggleFavorite = () => {
+        const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        
+        if (isFavorite) {
+            // Remove from favorites
+            const updatedFavorites = favorites.filter(fav => fav.placeId !== placeId);
+            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+        } else {
+            // Add to favorites
+            const newFavorite = {
+                placeId: placeId,
+                name: placeDetails.name,
+                address: placeDetails.formatted_address
+            };
+            localStorage.setItem('favorites', JSON.stringify([...favorites, newFavorite]));
+        }
+        
+        setIsFavorite(!isFavorite);
+    };
 
     if (loadError) return <div className="error-message">Error loading Google Maps</div>;
     if (!isLoaded) return <div className="loading">Loading Maps...</div>;
@@ -45,9 +69,20 @@ const PlaceDetail = () => {
 
     return (
         <div className="place-details-container">
-            <button className="back-button" onClick={() => navigate('/vibes')}>← Back to Map</button>
+            <div className="header-actions">
+                <button className="back-button" onClick={() => navigate('/vibes')}>← Back to Map</button>
+                <button className="favorites-button" onClick={() => navigate('/favorites')}>View Favorites</button>
+            </div>
             <div className="place-details-content">
-                <h1>{placeDetails.name}</h1>
+                <div className="place-header">
+                    <h1>{placeDetails.name}</h1>
+                    <button 
+                        className={`favorite-button ${isFavorite ? 'favorited' : ''}`}
+                        onClick={toggleFavorite}
+                    >
+                        {isFavorite ? '★' : '☆'}
+                    </button>
+                </div>
                 
                 {placeDetails.photos && placeDetails.photos[0] && (
                     <img 
