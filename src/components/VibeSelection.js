@@ -164,14 +164,6 @@ const VibeSelection = () => {
   },
 ];
 
-  const scrollToCard = (placeId) => {
-    setSelectedPlace(placeId);
-    locationRefs.current[placeId]?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
-  };
-
   return (
     <div className="vibe-selection">
       <div className="vibe-content">
