@@ -8,7 +8,7 @@ import Favorites from './components/Favorites';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/VibeFinder">
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
