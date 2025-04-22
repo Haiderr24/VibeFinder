@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from '@react-google-maps/api';
 import './VibeSelection.css';
-import { getGoogleMapsApiKey } from '../config';
 
 // Define libraries array as a constant outside the component
 const libraries = ["places"];
@@ -14,7 +13,7 @@ const VibeSelection = () => {
   const navigate = useNavigate();
 
   const {isLoaded, loadError} = useLoadScript({
-      googleMapsApiKey: getGoogleMapsApiKey(),
+      googleMapsApiKey: 'AIzaSyBXo-hKgTIP-nLA_659tAQl0TLuIFnl40c',
       libraries
   });
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLoadScript } from '@react-google-maps/api';
 import './PlaceDetail.css';
-import { getGoogleMapsApiKey } from '../config';
 
 const PlaceDetail = () => {
     const { placeId } = useParams();
@@ -13,7 +12,7 @@ const PlaceDetail = () => {
     const [isFavorite, setIsFavorite] = useState(false);
 
     const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: getGoogleMapsApiKey(),
+        googleMapsApiKey: 'AIzaSyBXo-hKgTIP-nLA_659tAQl0TLuIFnl40c',
         libraries: ["places"]
     });
 
