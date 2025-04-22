@@ -59,10 +59,8 @@ const VibeSelection = () => {
     service.nearbySearch(request, (results, status) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
         const limitedResults = results.slice(0, 20); // Limit to 20 total places
-        console.log(`Found ${limitedResults.length} places for ${vibe} vibe`);
         setPlaces(limitedResults);
       } else {
-        console.error(`Place search failed for ${vibe} vibe. Status:`, status);
         setPlaces([]);
       }
     });

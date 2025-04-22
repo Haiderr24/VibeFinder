@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import React from 'react';
 import LandingPage from './components/LandingPage';
@@ -8,7 +8,7 @@ import Favorites from './components/Favorites';
 
 function App() {
   return (
-    <Router basename="/VibeFinder">
+    <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
